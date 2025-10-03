@@ -1,0 +1,12 @@
+open_clip_torch
+opencv-python
+pillow
+numpy
+tqdm
+
+# For cpu/mps(mac), run:
+# torch
+# torchvision
+
+# For gpu with cuda, run (change cu121 to your cuda version):
+# pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121
