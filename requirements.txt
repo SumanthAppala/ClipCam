@@ -3,10 +3,11 @@ opencv-python
 pillow
 numpy
 tqdm
+streamlit
 
-# For cpu/mps(mac), run:
+# For cpu/mps(mac):
 # torch
 # torchvision
 
-# For gpu with cuda, run (change cu121 to your cuda version):
+# For gpu with cuda, run (change cu121 to your cuda version) in terminal:
 # pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121
