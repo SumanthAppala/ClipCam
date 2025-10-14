@@ -7,6 +7,7 @@ from PIL import Image
 from config import THUMBS_DIRNAME, CLIPS_DIRNAME
 from .common import ensure_dir
 from .video_io import grab_frame_at_sec
+from .video_io import grab_frame_at_sec, video_duration_seconds
 
 def save_thumbnail(video_path: Path, t_sec: float, thumbs_dir: Path, size=(480, 270)) -> Path:
     ensure_dir(thumbs_dir)
@@ -22,6 +23,47 @@ def save_thumbnail(video_path: Path, t_sec: float, thumbs_dir: Path, size=(480, 
     im.thumbnail(size)
     im.save(out_path, quality=90)
     return out_path
+
+def save_keyframes(video_path: Path, thumbs_dir: Path, size=(480, 270)):
+    """
+    Saves first_frame.jpg and last_frame.jpg into thumbs_dir.
+    Uses a small offset from the exact end to avoid EOF issues.
+    """
+    ensure_dir(thumbs_dir)
+
+    first_path = thumbs_dir / "first_frame.jpg"
+    last_path  = thumbs_dir / "last_frame.jpg"
+
+    cap = cv2.VideoCapture(str(video_path))
+    if not cap.isOpened():
+        print(f"[Keyframes] Could not open video: {video_path}")
+        return first_path, last_path
+
+    # First frame
+    im0 = grab_frame_at_sec(cap, 0.0)
+    if im0 is not None:
+        im = im0.copy()
+        if size:
+            im.thumbnail(size)
+        im.save(first_path, quality=90)
+
+    # Last frame (slightly before duration to avoid boundary read)
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    duration = video_duration_seconds(video_path)
+    t_last = max(0.0, duration - (1.0 / fps))
+    im1 = grab_frame_at_sec(cap, t_last)
+    if im1 is None:
+        # one more try a bit earlier
+        im1 = grab_frame_at_sec(cap, max(0.0, t_last - 0.5))
+    if im1 is not None:
+        im = im1.copy()
+        if size:
+            im.thumbnail(size)
+        im.save(last_path, quality=90)
+
+    cap.release()
+    print(f"[Keyframes] Saved: {first_path.name}, {last_path.name} -> {thumbs_dir}")
+    return first_path, last_path
 
 def have_ffmpeg() -> bool:
     return shutil.which("ffmpeg") is not None

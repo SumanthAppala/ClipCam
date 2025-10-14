@@ -1,4 +1,4 @@
-# ClipCAM
+  # ClipCAM
 
 Type a phrase → jump to the right part of a long video. This repo uses CLIP (ViT-B/32) to index frames at 1 fps, then performs sliding-window text–image matching to return time-stamped segments. Outputs (CSV, thumbnails, optional MP4 clips) live in `results/`.
 
@@ -41,3 +41,38 @@ python app.py search --video my_video.mp4 \
 - For frame-accurate MP4s with audio, use --clip-method ffmpeg --reencode.
 
 - Index sampling uses --sample-fps (default 1.0); higher fps = better recall, larger index.
+
+## How it works
+
+flowchart TD
+  A[User] --> B{Open app}
+  B --> C[Streamlit UI]
+  B --> D[CLI]
+  C --> E{Mode?}
+  D --> E
+  E -->|Index| I1[Read meta]
+  I1 --> I2[Timestamps]
+  I2 --> I3[Grab frames]
+  I3 --> I4[CLIP encode]
+  I4 --> I5[Save NPZ]
+  I5 --> Z[Ready]
+  E -->|Search| S1[Ensure index]
+  S1 --> S2[Encode query]
+  S2 --> S3[Score frames]
+  S3 --> S4{Mode}
+  S4 -->|Windows| S5[Slide and mean]
+  S4 -->|Auto| S7[Kadane]
+  S5 --> S8[Pick segments]
+  S7 --> S8
+  S8 --> S9[CSV]
+  S8 --> S10[Thumbs]
+  S8 --> S11{Clips?}
+  S11 -->|Yes| S12[Export MP4]
+  S11 -->|No| S14[Skip]
+  S12 --> S13{Edge frames?}
+  S13 -->|Yes| S15[Save first/last jpg]
+  S13 -->|No| S16[Skip]
+  C --> U1[Streamlit controls]
+  U1 --> U2[Run search]
+  U2 --> U3[Show results]
+

@@ -10,7 +10,7 @@ from utils.common import ensure_dir, slugify
 from utils.encoder import ClipEncoder
 from utils.indexer import build_index_npz, load_index_npz, index_path_for
 from utils.search import per_frame_scores, pick_top_segments
-from utils.export import save_thumbnail, export_clips
+from utils.export import save_thumbnail, export_clips, save_keyframes
 
 def _seconds_from_index(ts: np.ndarray, idx: int) -> float:
     idx = max(0, min(idx, len(ts)-1))
@@ -89,6 +89,9 @@ def cmd_search(args):
     # optional MP4 exports
     if args.save_clips:
         export_clips(video, results, clips_dir, method=args.clip_method, reencode=args.reencode)
+    # Also save first/last frame if requested
+    if args.save_keyframes:
+        save_keyframes(video, thumbs_dir)
 
 def main():
     ap = argparse.ArgumentParser(prog="clipmoments", description="Text-to-video moment search (CLIP MVP)")
@@ -113,6 +116,8 @@ def main():
     ap_s.add_argument("--save-clips", action="store_true")
     ap_s.add_argument("--clip-method", choices=["auto","ffmpeg","opencv"], default="auto")
     ap_s.add_argument("--reencode", action="store_true")
+    ap_s.add_argument("--save-keyframes", action="store_true",
+                  help="Also save first_frame.jpg and last_frame.jpg in results/<video>/thumbs")
     ap_s.set_defaults(func=cmd_search)
 
     args = ap.parse_args()
