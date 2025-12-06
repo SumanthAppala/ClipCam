@@ -1,4 +1,4 @@
-import argparse
+'''import argparse
 from pathlib import Path
 import numpy as np
 
@@ -125,3 +125,50 @@ def main():
 
 if __name__ == "__main__":
     main()
+'''
+import streamlit as st
+from PIL import Image
+from streamlit_lottie import st_lottie
+import json
+import pages.clipcam_search as cs
+
+# Page setup
+st.set_page_config(page_title="The Case of ClipCam", layout="wide")
+
+# Initialize session state
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+# --- Navigation ---
+if st.session_state.page == "search":
+    cs.main()  # show only the search page
+else:
+    # --- Home page content ---
+    logo = Image.open("assets/image_logo.jpg")
+    with open("assets/detective search.json", "r") as f:
+        detective_walk = json.load(f)
+
+    st.markdown("""
+    <h1 style="text-align:center; font-size:60px; margin-top:20px;">
+    🕵️ The Case of ClipCam
+    </h1>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1.25, 2, 1])
+    with col2:
+        st.image("assets/image_logo-modified.png", width=400)
+
+    st_lottie(detective_walk, height=350, key="detective_walk")
+
+    st.markdown("""
+    <p style="text-align:center; font-size:22px; color: #777; margin-top:20px;">
+    Where detectives uncover hidden moments inside videos
+    </p>
+    """, unsafe_allow_html=True)
+
+    # Button slightly to the right
+    col1, col2, col3 = st.columns([2, 2, 1])
+    with col2:
+        clicked = st.button("🔎 Begin the Investigation")
+        if clicked:
+            st.session_state.page = "search"
