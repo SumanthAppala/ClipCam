@@ -17,7 +17,7 @@ except ImportError:
     st.error("Please install streamlit-lottie: `pip install streamlit-lottie`")
     st.stop()
 
-# --- Your existing imports ---
+                               
 from config import (
     MODEL_NAME, PRETRAINED, SAMPLE_FPS, WINDOWS_DEFAULT, MIN_GAP_SEC,
     DATA_ROOT, RESULTS_ROOT, THUMBS_DIRNAME, CLIPS_DIRNAME, RESULTS_CSV_FMT
@@ -29,18 +29,9 @@ from utils.search import per_frame_scores, pick_top_segments
 from utils.export import save_thumbnail, export_clips, save_keyframes
 from utils.detector import ObjectDetector
 from utils.llm import GeminiChat
-
-# -----------------------------------------------------------------------------
-# 1. PAGE CONFIGURATION (Must be the first Streamlit command)
-# -----------------------------------------------------------------------------
+                                                                         
 st.set_page_config(page_title="The Case of ClipCam", layout="wide")
 
-
-# -----------------------------------------------------------------------------
-# 2. SETUP & HELPER FUNCTIONS
-# -----------------------------------------------------------------------------
-
-# API Key Setup
 api_key = os.environ.get("GOOGLE_API_KEY")
 if not api_key:
     if "GOOGLE_API_KEY" in st.secrets:
@@ -189,11 +180,9 @@ def run_search_top1(
         "idx_path": idx_path,
     }
 
-# -----------------------------------------------------------------------------
-# 3. PAGE LOGIC: HOME
-# -----------------------------------------------------------------------------
+                                                       
 def render_home_page():
-    # Attempt to load assets gracefully
+                                       
     try:
         with open("assets/detective search.json", "r") as f:
             detective_walk = json.load(f)
@@ -201,7 +190,7 @@ def render_home_page():
         st.warning("Animation file 'assets/detective search.json' not found.")
         detective_walk = None
 
-    # Title
+           
     st.markdown("""
     <h1 style="text-align:center; font-size:60px; margin-top:20px; color: #000000;">
     🕵️ Sherlock.AI
@@ -210,7 +199,7 @@ def render_home_page():
 
     col1, col2, col3 = st.columns([1.65, 1.5, 1.5 ])
     with col2:
-        # Check if logo exists
+                              
         if os.path.exists("assets/image_logo-modified.png"):
             st.image("assets/image_logo-modified.png", width=400)
         elif os.path.exists("assets/image_logo.jpg"):
@@ -218,16 +207,14 @@ def render_home_page():
         else:
             st.info("(Logo image not found in assets/)")
 
-    # if detective_walk:
-    #     st_lottie(detective_walk, height=350, key="detective_walk")
-
+                        
     st.markdown("""
     <p style="text-align:center; font-size:22px; color: #777; margin-top:20px;">
     Where detectives uncover hidden moments inside videos
     </p>
     """, unsafe_allow_html=True)
 
-    # Center the button
+                       
     c1, c2, c3 = st.columns([1, 2, 1])
     with c2:
         clicked = st.button("🔎 Begin the Investigation", type="primary", use_container_width=True)
@@ -235,18 +222,17 @@ def render_home_page():
             st.session_state.page = "search"
             st.rerun()
 
-# -----------------------------------------------------------------------------
-# 4. PAGE LOGIC: SEARCH (Your existing app)
-# -----------------------------------------------------------------------------
+                              
+                                                                               
 def render_search_page():
-    # Back button to go home
+                            
     if st.sidebar.button("← Back to Home"):
         st.session_state.page = "home"
         st.rerun()
 
     st.title("🎬 ClipCam (Text-to-Video Moment Search)")
 
-    # Sidebar Options
+                     
     with st.sidebar:
         st.subheader("Options")
         model_name = st.text_input("Model", MODEL_NAME)
@@ -256,18 +242,18 @@ def render_search_page():
         windows_str = st.text_input("Window sizes (sec, comma-separated)", windows_default_str)
         min_gap_s = st.number_input("Min gap between picks (sec)", value=float(MIN_GAP_SEC), min_value=0.0, step=0.5)
         
-        # Additional settings
+                             
         reencode = st.checkbox("Re-encode exported clip", value=False)
         save_keyframes_flag = st.checkbox("Also save first/last frame", value=False)
         draw_boxes = st.checkbox("Draw Bounding Boxes", value=True)
 
-    # Main Inputs
+                 
     video_file = st.file_uploader("Upload a video", type=["mp4", "mov", "mkv", "avi", "webm"])
     query = st.text_input("Prompt / Query", placeholder="e.g., 'a dog jumping into the pool'")
 
     run = st.button("Find Evidence")
 
-    # --- Search Logic ---
+                          
     if run:
         if not video_file:
             st.error("Please upload a video.")
@@ -276,7 +262,7 @@ def render_search_page():
             st.error("Please enter a query.")
             st.stop()
             
-        # Parse windows
+                       
         try:
             windows_s = [float(x.strip()) for x in windows_str.split(",") if x.strip()]
             if not windows_s: raise ValueError
@@ -284,13 +270,13 @@ def render_search_page():
             st.error("Window sizes must be a comma-separated list of numbers (seconds).")
             st.stop()
 
-        # Load detector if needed
+                                 
         detector_instance = None
         if draw_boxes:
             with st.spinner("Loading Object Detection Model..."):
                 detector_instance = load_detector()
 
-        # Reset chat on new search
+                                  
         st.session_state.chat_history = []
         st.session_state.gemini_instance = None
         st.session_state.current_clip_path = None
@@ -323,7 +309,7 @@ def render_search_page():
             st.error("Could not extract clip.")
             st.stop()
 
-        # Initialize Gemini with the Found Clip
+                                               
         with st.spinner("Analyzing clip..."):
             gemini = GeminiChat()
             gemini.upload_video(st.session_state.current_clip_path)
@@ -332,16 +318,16 @@ def render_search_page():
             st.session_state.gemini_instance = gemini
             st.session_state.chat_history.append({"role": "assistant", "content": initial_response})
 
-        # Display summary
+                         
         t0, t1, sc, W = results[0]
         st.success(f"Top segment: {t0:.2f}s → {t1:.2f}s  (W={W}s)")
 
-    # --- Persistent Display Logic (Video & Chat) ---
+                                                     
     if st.session_state.current_clip_path:
         st.subheader("Best Match")
         st.video(str(st.session_state.current_clip_path))
         
-        # Download button (without re-reading file unless clicked)
+                                                                  
         with open(st.session_state.current_clip_path, "rb") as f:
             st.download_button(
                 label="Download Clip",
@@ -370,13 +356,8 @@ def render_search_page():
             
             st.session_state.chat_history.append({"role": "assistant", "content": response_text})
 
-# -----------------------------------------------------------------------------
-# 5. MAIN ROUTER
-# -----------------------------------------------------------------------------
-
 inject_custom_css()
-
-# Initialize Session State
+                          
 if "page" not in st.session_state:
     st.session_state.page = "home"
     
@@ -387,7 +368,7 @@ if "gemini_instance" not in st.session_state:
 if "current_clip_path" not in st.session_state:
     st.session_state.current_clip_path = None
 
-# Route based on state
+                      
 if st.session_state.page == "search":
     render_search_page()
 else:
