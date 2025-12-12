@@ -1,6 +1,3 @@
-Here is the complete `README.md` file with **Step 2 (API Keys)** and everything following it (Usage, Outputs, Configuration) fully integrated into the Markdown code block.
-
-````markdown
 # ClipCAM: Semantic Video Search & Conversational AI
 
 **ClipCAM** is a multi-modal computer vision tool that allows users to "talk" to their videos. By leveraging **CLIP (ViT-B/32)** for semantic indexing and **Google Gemini** for conversational reasoning, this tool enables users to find specific moments in long videos using natural language queries and engage in a dialogue about the video content.
@@ -10,8 +7,6 @@ Here is the complete `README.md` file with **Step 2 (API Keys)** and everything 
 * **Conversational Interface:** Integrated with **Google Gemini** to answer questions about the video content based on indexed metadata.
 * **Dual Interface:** Run as a robust Command Line Interface (CLI) for batch processing or a **Streamlit Web App** for interactive exploration.
 * **Multi-Modal Output:** Generates CSV logs, thumbnails, and clipped MP4 segments.
-
----
 
 ## 🛠 Setup
 
