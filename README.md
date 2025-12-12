@@ -108,10 +108,3 @@ Results are saved in `results/<video_stem>/`:
 | `--reencode` | `False` | If using ffmpeg, this forces re-encoding for frame-accurate cuts (slower). |
 
 -----
-
-## 📜 Project Context
-
-This project was developed as a Computer Vision final project (University of Pennsylvania), exploring the intersection of contrastive language-image pre-training (CLIP) and Large Language Models (LLMs) for video understanding.
-
-```
-```
