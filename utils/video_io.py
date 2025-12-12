@@ -31,5 +31,5 @@ def grab_frame_at_sec(cap: cv2.VideoCapture, t_sec: float) -> Optional[Image.Ima
     ok, frame = cap.read()
     if not ok or frame is None:
         return None
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR->RGB
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)            
     return Image.fromarray(frame)

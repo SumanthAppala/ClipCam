@@ -20,7 +20,7 @@ class ClipEncoder:
     @torch.inference_mode()
     def encode_images(self, images: List[Image.Image]) -> np.ndarray:
         if not images:
-            # 512 is typical for ViT-B/32; not used when empty
+                                                              
             return np.zeros((0, 512), dtype=np.float32)
         outs = []
         for batch in chunks(images, BATCH_SIZE):

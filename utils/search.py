@@ -2,7 +2,7 @@ from typing import Iterable, List, Tuple
 import numpy as np
 
 def per_frame_scores(E: np.ndarray, t_vec: np.ndarray) -> np.ndarray:
-    # Both are L2-normalized -> cosine similarity
+                                                 
     return E @ t_vec
 
 def window_scores(prefix: np.ndarray, W: int) -> np.ndarray:
